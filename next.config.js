@@ -9,8 +9,18 @@ const withPWA = require('next-pwa')({
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['maps.googleapis.com', 'maps.google.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'maps.googleapis.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'maps.google.com',
+      },
+    ],
   },
+  turbopack: {},
 }
 
 module.exports = withPWA(nextConfig)
