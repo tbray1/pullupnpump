@@ -1,6 +1,3 @@
-// This file can be auto-generated using: npx supabase gen types typescript --project-id YOUR_PROJECT_ID > lib/supabase/database.types.ts
-// For now, we'll use a simplified version
-
 export type Json =
   | string
   | number
@@ -9,392 +6,511 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export interface Database {
+export type Database = {
+  // Allows to automatically instantiate createClient with right options
+  // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+  __InternalSupabase: {
+    PostgrestVersion: "13.0.5"
+  }
   public: {
     Tables: {
-      profiles: {
-        Row: {
-          id: string
-          email: string
-          role: 'customer' | 'driver' | 'admin'
-          full_name: string
-          phone: string | null
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id: string
-          email: string
-          role?: 'customer' | 'driver' | 'admin'
-          full_name: string
-          phone?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          email?: string
-          role?: 'customer' | 'driver' | 'admin'
-          full_name?: string
-          phone?: string | null
-          created_at?: string
-          updated_at?: string
-        }
-      }
       customers: {
         Row: {
+          created_at: string | null
           id: string
           stripe_customer_id: string | null
-          subscription_status: 'active' | 'inactive' | 'cancelled' | null
-          created_at: string
-          updated_at: string
+          subscription_status:
+            | Database["public"]["Enums"]["subscription_status"]
+            | null
+          updated_at: string | null
         }
         Insert: {
+          created_at?: string | null
           id: string
           stripe_customer_id?: string | null
-          subscription_status?: 'active' | 'inactive' | 'cancelled' | null
-          created_at?: string
-          updated_at?: string
+          subscription_status?:
+            | Database["public"]["Enums"]["subscription_status"]
+            | null
+          updated_at?: string | null
         }
         Update: {
+          created_at?: string | null
           id?: string
           stripe_customer_id?: string | null
-          subscription_status?: 'active' | 'inactive' | 'cancelled' | null
-          created_at?: string
-          updated_at?: string
+          subscription_status?:
+            | Database["public"]["Enums"]["subscription_status"]
+            | null
+          updated_at?: string | null
         }
+        Relationships: [
+          {
+            foreignKeyName: "customers_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       drivers: {
         Row: {
-          id: string
-          status: 'online' | 'offline' | 'busy'
-          vehicle_info: string | null
-          license_number: string | null
+          created_at: string | null
           current_latitude: number | null
-          current_longitude: number | null
           current_location_updated_at: string | null
+          current_longitude: number | null
+          id: string
+          is_active: boolean | null
+          is_approved: boolean | null
+          license_number: string | null
           rating: number | null
+          status: Database["public"]["Enums"]["driver_status"] | null
           total_deliveries: number | null
-          is_approved: boolean
-          is_active: boolean
-          created_at: string
-          updated_at: string
+          updated_at: string | null
+          vehicle_info: string | null
         }
         Insert: {
-          id: string
-          status?: 'online' | 'offline' | 'busy'
-          vehicle_info?: string | null
-          license_number?: string | null
+          created_at?: string | null
           current_latitude?: number | null
-          current_longitude?: number | null
           current_location_updated_at?: string | null
-          rating?: number | null
-          total_deliveries?: number | null
-          is_approved?: boolean
-          is_active?: boolean
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          status?: 'online' | 'offline' | 'busy'
-          vehicle_info?: string | null
+          current_longitude?: number | null
+          id: string
+          is_active?: boolean | null
+          is_approved?: boolean | null
           license_number?: string | null
-          current_latitude?: number | null
-          current_longitude?: number | null
-          current_location_updated_at?: string | null
           rating?: number | null
+          status?: Database["public"]["Enums"]["driver_status"] | null
           total_deliveries?: number | null
-          is_approved?: boolean
-          is_active?: boolean
-          created_at?: string
-          updated_at?: string
-        }
-      }
-      vehicles: {
-        Row: {
-          id: string
-          customer_id: string
-          make: string
-          model: string
-          year: number
-          color: string | null
-          license_plate: string | null
-          fuel_type: 'regular' | 'premium' | 'diesel'
-          tank_capacity: number | null
-          is_default: boolean
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          customer_id: string
-          make: string
-          model: string
-          year: number
-          color?: string | null
-          license_plate?: string | null
-          fuel_type: 'regular' | 'premium' | 'diesel'
-          tank_capacity?: number | null
-          is_default?: boolean
-          created_at?: string
-          updated_at?: string
+          updated_at?: string | null
+          vehicle_info?: string | null
         }
         Update: {
+          created_at?: string | null
+          current_latitude?: number | null
+          current_location_updated_at?: string | null
+          current_longitude?: number | null
           id?: string
-          customer_id?: string
-          make?: string
-          model?: string
-          year?: number
-          color?: string | null
-          license_plate?: string | null
-          fuel_type?: 'regular' | 'premium' | 'diesel'
-          tank_capacity?: number | null
-          is_default?: boolean
-          created_at?: string
-          updated_at?: string
+          is_active?: boolean | null
+          is_approved?: boolean | null
+          license_number?: string | null
+          rating?: number | null
+          status?: Database["public"]["Enums"]["driver_status"] | null
+          total_deliveries?: number | null
+          updated_at?: string | null
+          vehicle_info?: string | null
         }
-      }
-      service_locations: {
-        Row: {
-          id: string
-          customer_id: string
-          name: string
-          address: string
-          latitude: number
-          longitude: number
-          is_default: boolean
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          customer_id: string
-          name: string
-          address: string
-          latitude: number
-          longitude: number
-          is_default?: boolean
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          customer_id?: string
-          name?: string
-          address?: string
-          latitude?: number
-          longitude?: number
-          is_default?: boolean
-          created_at?: string
-          updated_at?: string
-        }
+        Relationships: [
+          {
+            foreignKeyName: "drivers_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       jobs: {
         Row: {
-          id: string
+          arrived_at: string | null
+          cancellation_reason: string | null
+          cancelled_at: string | null
+          completed_at: string | null
+          created_at: string | null
           customer_id: string
-          driver_id: string | null
-          vehicle_id: string
-          service_location_id: string
-          fuel_type: 'regular' | 'premium' | 'diesel'
-          gallons_requested: number | null
-          gallons_delivered: number | null
-          status: 'pending' | 'assigned' | 'accepted' | 'en_route' | 'arrived' | 'fueling' | 'completed' | 'cancelled'
-          scheduled_for: string | null
-          is_asap: boolean
+          delivery_address: string
           delivery_latitude: number
           delivery_longitude: number
-          delivery_address: string
-          price_per_gallon: number
-          service_fee: number
-          total_amount: number
-          payment_intent_id: string | null
-          payment_status: 'pending' | 'processing' | 'succeeded' | 'failed'
+          driver_id: string | null
           driver_latitude: number | null
-          driver_longitude: number | null
           driver_location_updated_at: string | null
+          driver_longitude: number | null
           estimated_arrival: string | null
-          arrived_at: string | null
-          started_fueling_at: string | null
-          completed_at: string | null
-          cancelled_at: string | null
-          cancellation_reason: string | null
+          fuel_type: Database["public"]["Enums"]["fuel_type"]
+          gallons_delivered: number | null
+          gallons_requested: number | null
+          id: string
+          is_asap: boolean | null
           notes: string | null
-          created_at: string
-          updated_at: string
+          payment_intent_id: string | null
+          payment_status: Database["public"]["Enums"]["payment_status"] | null
+          price_per_gallon: number
+          scheduled_for: string | null
+          service_fee: number
+          service_location_id: string
+          started_fueling_at: string | null
+          status: Database["public"]["Enums"]["job_status"] | null
+          total_amount: number
+          updated_at: string | null
+          vehicle_id: string
         }
         Insert: {
-          id?: string
+          arrived_at?: string | null
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          completed_at?: string | null
+          created_at?: string | null
           customer_id: string
-          driver_id?: string | null
-          vehicle_id: string
-          service_location_id: string
-          fuel_type: 'regular' | 'premium' | 'diesel'
-          gallons_requested?: number | null
-          gallons_delivered?: number | null
-          status?: 'pending' | 'assigned' | 'accepted' | 'en_route' | 'arrived' | 'fueling' | 'completed' | 'cancelled'
-          scheduled_for?: string | null
-          is_asap?: boolean
+          delivery_address: string
           delivery_latitude: number
           delivery_longitude: number
-          delivery_address: string
-          price_per_gallon: number
-          service_fee: number
-          total_amount: number
-          payment_intent_id?: string | null
-          payment_status?: 'pending' | 'processing' | 'succeeded' | 'failed'
+          driver_id?: string | null
           driver_latitude?: number | null
-          driver_longitude?: number | null
           driver_location_updated_at?: string | null
+          driver_longitude?: number | null
           estimated_arrival?: string | null
-          arrived_at?: string | null
-          started_fueling_at?: string | null
-          completed_at?: string | null
-          cancelled_at?: string | null
-          cancellation_reason?: string | null
+          fuel_type: Database["public"]["Enums"]["fuel_type"]
+          gallons_delivered?: number | null
+          gallons_requested?: number | null
+          id?: string
+          is_asap?: boolean | null
           notes?: string | null
-          created_at?: string
-          updated_at?: string
+          payment_intent_id?: string | null
+          payment_status?: Database["public"]["Enums"]["payment_status"] | null
+          price_per_gallon: number
+          scheduled_for?: string | null
+          service_fee: number
+          service_location_id: string
+          started_fueling_at?: string | null
+          status?: Database["public"]["Enums"]["job_status"] | null
+          total_amount: number
+          updated_at?: string | null
+          vehicle_id: string
         }
         Update: {
-          id?: string
+          arrived_at?: string | null
+          cancellation_reason?: string | null
+          cancelled_at?: string | null
+          completed_at?: string | null
+          created_at?: string | null
           customer_id?: string
-          driver_id?: string | null
-          vehicle_id?: string
-          service_location_id?: string
-          fuel_type?: 'regular' | 'premium' | 'diesel'
-          gallons_requested?: number | null
-          gallons_delivered?: number | null
-          status?: 'pending' | 'assigned' | 'accepted' | 'en_route' | 'arrived' | 'fueling' | 'completed' | 'cancelled'
-          scheduled_for?: string | null
-          is_asap?: boolean
+          delivery_address?: string
           delivery_latitude?: number
           delivery_longitude?: number
-          delivery_address?: string
-          price_per_gallon?: number
-          service_fee?: number
-          total_amount?: number
-          payment_intent_id?: string | null
-          payment_status?: 'pending' | 'processing' | 'succeeded' | 'failed'
+          driver_id?: string | null
           driver_latitude?: number | null
-          driver_longitude?: number | null
           driver_location_updated_at?: string | null
+          driver_longitude?: number | null
           estimated_arrival?: string | null
-          arrived_at?: string | null
-          started_fueling_at?: string | null
-          completed_at?: string | null
-          cancelled_at?: string | null
-          cancellation_reason?: string | null
+          fuel_type?: Database["public"]["Enums"]["fuel_type"]
+          gallons_delivered?: number | null
+          gallons_requested?: number | null
+          id?: string
+          is_asap?: boolean | null
           notes?: string | null
-          created_at?: string
-          updated_at?: string
+          payment_intent_id?: string | null
+          payment_status?: Database["public"]["Enums"]["payment_status"] | null
+          price_per_gallon?: number
+          scheduled_for?: string | null
+          service_fee?: number
+          service_location_id?: string
+          started_fueling_at?: string | null
+          status?: Database["public"]["Enums"]["job_status"] | null
+          total_amount?: number
+          updated_at?: string | null
+          vehicle_id?: string
         }
-      }
-      payment_methods: {
-        Row: {
-          id: string
-          customer_id: string
-          stripe_payment_method_id: string
-          type: string
-          last4: string
-          brand: string
-          exp_month: number
-          exp_year: number
-          is_default: boolean
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          customer_id: string
-          stripe_payment_method_id: string
-          type?: string
-          last4: string
-          brand: string
-          exp_month: number
-          exp_year: number
-          is_default?: boolean
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          customer_id?: string
-          stripe_payment_method_id?: string
-          type?: string
-          last4?: string
-          brand?: string
-          exp_month?: number
-          exp_year?: number
-          is_default?: boolean
-          created_at?: string
-          updated_at?: string
-        }
-      }
-      transactions: {
-        Row: {
-          id: string
-          job_id: string
-          customer_id: string
-          amount: number
-          status: 'pending' | 'succeeded' | 'failed' | 'refunded'
-          stripe_payment_intent_id: string
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          job_id: string
-          customer_id: string
-          amount: number
-          status?: 'pending' | 'succeeded' | 'failed' | 'refunded'
-          stripe_payment_intent_id: string
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          job_id?: string
-          customer_id?: string
-          amount?: number
-          status?: 'pending' | 'succeeded' | 'failed' | 'refunded'
-          stripe_payment_intent_id?: string
-          created_at?: string
-          updated_at?: string
-        }
+        Relationships: [
+          {
+            foreignKeyName: "jobs_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "jobs_driver_id_fkey"
+            columns: ["driver_id"]
+            isOneToOne: false
+            referencedRelation: "drivers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "jobs_service_location_id_fkey"
+            columns: ["service_location_id"]
+            isOneToOne: false
+            referencedRelation: "service_locations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "jobs_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       notifications: {
         Row: {
+          created_at: string | null
           id: string
-          user_id: string
-          title: string
           message: string
-          type: string
-          read: boolean
+          read: boolean | null
           related_job_id: string | null
-          created_at: string
+          title: string
+          type: string | null
+          user_id: string
         }
         Insert: {
+          created_at?: string | null
           id?: string
-          user_id: string
-          title: string
           message: string
-          type?: string
-          read?: boolean
+          read?: boolean | null
           related_job_id?: string | null
-          created_at?: string
+          title: string
+          type?: string | null
+          user_id: string
         }
         Update: {
+          created_at?: string | null
           id?: string
-          user_id?: string
-          title?: string
           message?: string
-          type?: string
-          read?: boolean
+          read?: boolean | null
           related_job_id?: string | null
-          created_at?: string
+          title?: string
+          type?: string | null
+          user_id?: string
         }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_related_job_id_fkey"
+            columns: ["related_job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notifications_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payment_methods: {
+        Row: {
+          brand: string
+          created_at: string | null
+          customer_id: string
+          exp_month: number
+          exp_year: number
+          id: string
+          is_default: boolean | null
+          last4: string
+          stripe_payment_method_id: string
+          type: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          brand: string
+          created_at?: string | null
+          customer_id: string
+          exp_month: number
+          exp_year: number
+          id?: string
+          is_default?: boolean | null
+          last4: string
+          stripe_payment_method_id: string
+          type?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          brand?: string
+          created_at?: string | null
+          customer_id?: string
+          exp_month?: number
+          exp_year?: number
+          id?: string
+          is_default?: boolean | null
+          last4?: string
+          stripe_payment_method_id?: string
+          type?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_methods_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string | null
+          email: string
+          full_name: string
+          id: string
+          phone: string | null
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          email: string
+          full_name: string
+          id: string
+          phone?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          email?: string
+          full_name?: string
+          id?: string
+          phone?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      service_locations: {
+        Row: {
+          address: string
+          created_at: string | null
+          customer_id: string
+          id: string
+          is_default: boolean | null
+          latitude: number
+          longitude: number
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          address: string
+          created_at?: string | null
+          customer_id: string
+          id?: string
+          is_default?: boolean | null
+          latitude: number
+          longitude: number
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          address?: string
+          created_at?: string | null
+          customer_id?: string
+          id?: string
+          is_default?: boolean | null
+          latitude?: number
+          longitude?: number
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "service_locations_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transactions: {
+        Row: {
+          amount: number
+          created_at: string | null
+          customer_id: string
+          id: string
+          job_id: string
+          status: Database["public"]["Enums"]["payment_status"] | null
+          stripe_payment_intent_id: string
+          updated_at: string | null
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          customer_id: string
+          id?: string
+          job_id: string
+          status?: Database["public"]["Enums"]["payment_status"] | null
+          stripe_payment_intent_id: string
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          customer_id?: string
+          id?: string
+          job_id?: string
+          status?: Database["public"]["Enums"]["payment_status"] | null
+          stripe_payment_intent_id?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transactions_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      vehicles: {
+        Row: {
+          color: string | null
+          created_at: string | null
+          customer_id: string
+          fuel_type: Database["public"]["Enums"]["fuel_type"]
+          id: string
+          is_default: boolean | null
+          license_plate: string | null
+          make: string
+          model: string
+          tank_capacity: number | null
+          updated_at: string | null
+          year: number
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string | null
+          customer_id: string
+          fuel_type: Database["public"]["Enums"]["fuel_type"]
+          id?: string
+          is_default?: boolean | null
+          license_plate?: string | null
+          make: string
+          model: string
+          tank_capacity?: number | null
+          updated_at?: string | null
+          year: number
+        }
+        Update: {
+          color?: string | null
+          created_at?: string | null
+          customer_id?: string
+          fuel_type?: Database["public"]["Enums"]["fuel_type"]
+          id?: string
+          is_default?: boolean | null
+          license_plate?: string | null
+          make?: string
+          model?: string
+          tank_capacity?: number | null
+          updated_at?: string | null
+          year?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicles_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -402,29 +518,138 @@ export interface Database {
     }
     Functions: {
       get_nearby_drivers: {
-        Args: {
-          job_lat: number
-          job_lng: number
-          radius_km?: number
-        }
+        Args: { job_lat: number; job_lng: number; radius_km?: number }
         Returns: {
+          distance_km: number
           driver_id: string
           driver_name: string
-          distance_km: number
           rating: number
         }[]
       }
     }
     Enums: {
-      user_role: 'customer' | 'driver' | 'admin'
-      driver_status: 'online' | 'offline' | 'busy'
-      job_status: 'pending' | 'assigned' | 'accepted' | 'en_route' | 'arrived' | 'fueling' | 'completed' | 'cancelled'
-      fuel_type: 'regular' | 'premium' | 'diesel'
-      payment_status: 'pending' | 'processing' | 'succeeded' | 'failed' | 'refunded'
-      subscription_status: 'active' | 'inactive' | 'cancelled'
+      driver_status: "online" | "offline" | "busy"
+      fuel_type: "regular" | "premium" | "diesel"
+      job_status:
+        | "pending"
+        | "assigned"
+        | "accepted"
+        | "en_route"
+        | "arrived"
+        | "fueling"
+        | "completed"
+        | "cancelled"
+      payment_status:
+        | "pending"
+        | "processing"
+        | "succeeded"
+        | "failed"
+        | "refunded"
+      subscription_status: "active" | "inactive" | "cancelled"
+      user_role: "customer" | "driver" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
     }
   }
 }
+
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+
+export type Tables<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      Row: infer R
+    }
+    ? R
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
+
+export type TablesInsert<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Insert: infer I
+    }
+    ? I
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
+
+export type TablesUpdate<
+  DefaultSchemaTableNameOrOptions extends
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
+> = DefaultSchemaTableNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+      Update: infer U
+    }
+    ? U
+    : never
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
+
+export type Enums<
+  DefaultSchemaEnumNameOrOptions extends
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
+  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals
+  }
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
+> = DefaultSchemaEnumNameOrOptions extends {
+  schema: keyof DatabaseWithoutInternals
+}
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never

@@ -54,7 +54,8 @@ export function formatCurrency(amount: number): string {
 }
 
 // Format date/time
-export function formatDateTime(date: string | Date): string {
+export function formatDateTime(date: string | Date | null): string {
+  if (!date) return 'N/A'
   return new Intl.DateTimeFormat('en-US', {
     month: 'short',
     day: 'numeric',
@@ -65,7 +66,8 @@ export function formatDateTime(date: string | Date): string {
 }
 
 // Format time only
-export function formatTime(date: string | Date): string {
+export function formatTime(date: string | Date | null): string {
+  if (!date) return 'N/A'
   return new Intl.DateTimeFormat('en-US', {
     hour: 'numeric',
     minute: '2-digit',
@@ -94,7 +96,8 @@ export function isValidEmail(email: string): boolean {
 }
 
 // Get status color class
-export function getStatusColor(status: string): string {
+export function getStatusColor(status: string | null): string {
+  if (!status) return 'bg-gray-100 text-gray-800'
   const statusColors: Record<string, string> = {
     pending: 'status-pending',
     assigned: 'status-pending',
@@ -112,7 +115,8 @@ export function getStatusColor(status: string): string {
 }
 
 // Format status label
-export function formatStatus(status: string): string {
+export function formatStatus(status: string | null): string {
+  if (!status) return 'Unknown'
   return status
     .split('_')
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))

@@ -12,8 +12,10 @@ export default function TrackJobPage() {
   const params = useParams()
   const router = useRouter()
   const supabase = createClient()
+  const jobId = typeof params.id === 'string' ? params.id : ''
 
   useEffect(() => {
+    if (!jobId) return
     loadJob()
 
     // Subscribe to real-time updates
@@ -25,7 +27,7 @@ export default function TrackJobPage() {
           event: 'UPDATE',
           schema: 'public',
           table: 'jobs',
-          filter: `id=eq.${params.id}`,
+          filter: `id=eq.${jobId}`,
         },
         (payload) => {
           setJob(payload.new)
@@ -39,9 +41,10 @@ export default function TrackJobPage() {
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [params.id])
+  }, [jobId])
 
   const loadJob = async () => {
+    if (!jobId) return
     try {
       const { data: jobData, error } = await supabase
         .from('jobs')
@@ -50,7 +53,7 @@ export default function TrackJobPage() {
           vehicles (make, model, year, color),
           service_locations (name, address)
         `)
-        .eq('id', params.id)
+        .eq('id', jobId)
         .single()
 
       if (error) throw error
@@ -90,7 +93,7 @@ export default function TrackJobPage() {
           cancelled_at: new Date().toISOString(),
           cancellation_reason: 'Cancelled by customer',
         })
-        .eq('id', params.id)
+        .eq('id', jobId)
 
       if (error) throw error
 
@@ -105,8 +108,8 @@ export default function TrackJobPage() {
     return (
       <div className="flex items-center justify-center min-h-96">
         <div className="text-center">
-          <div className="text-4xl mb-4">⏳</div>
-          <p className="text-gray-600">Loading delivery details...</p>
+          <div className="text-4xl mb-4 animate-pulse">⏳</div>
+          <p className="text-asphalt-300 font-display font-semibold tracking-wide">LOADING DELIVERY DATA...</p>
         </div>
       </div>
     )
@@ -117,7 +120,7 @@ export default function TrackJobPage() {
       <div className="flex items-center justify-center min-h-96">
         <div className="text-center">
           <div className="text-4xl mb-4">❌</div>
-          <p className="text-gray-600">Delivery not found</p>
+          <p className="text-asphalt-300 font-display font-semibold tracking-wide">DELIVERY NOT FOUND</p>
         </div>
       </div>
     )
@@ -135,50 +138,64 @@ export default function TrackJobPage() {
   const currentStatusIndex = statusSteps.findIndex((s) => s.key === job.status)
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-6xl mx-auto space-y-8 p-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-900">Track Delivery</h1>
-        <span className={`status-badge text-lg ${getStatusColor(job.status)}`}>
+      <div className="flex items-center justify-between flex-wrap gap-4">
+        <div>
+          <h1 className="font-display font-bold text-4xl md:text-5xl text-asphalt-100 tracking-tight mb-2">
+            TRACK DELIVERY
+          </h1>
+          <p className="text-asphalt-400 font-medium">Order #{jobId.slice(0, 8).toUpperCase()}</p>
+        </div>
+        <span className={`status-badge text-base ${getStatusColor(job.status)}`}>
           {formatStatus(job.status)}
         </span>
       </div>
 
-      {/* Status Timeline */}
+      {/* Status Timeline - Highway Road */}
       {job.status !== 'cancelled' && (
-        <div className="card">
-          <div className="flex items-center justify-between">
-            {statusSteps.map((step, index) => (
-              <div key={step.key} className="flex-1 flex items-center">
-                <div className="flex flex-col items-center flex-1">
-                  <div
-                    className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl mb-2 ${
-                      index <= currentStatusIndex
-                        ? 'bg-primary-600 text-white'
-                        : 'bg-gray-200 text-gray-400'
-                    }`}
-                  >
-                    {step.icon}
+        <div className="card bg-asphalt-800/80 p-8">
+          <div className="relative">
+            {/* Road */}
+            <div className="absolute top-8 left-0 right-0 h-1 bg-asphalt-600"></div>
+            <div className="absolute top-8 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-fuel-500/20 to-transparent"
+                 style={{width: `${(currentStatusIndex / (statusSteps.length - 1)) * 100}%`}}></div>
+
+            <div className="flex items-start justify-between relative">
+              {statusSteps.map((step, index) => {
+                const isActive = index <= currentStatusIndex
+                const isCurrent = index === currentStatusIndex
+
+                return (
+                  <div key={step.key} className="flex flex-col items-center" style={{flex: '1 1 0'}}>
+                    <div
+                      className={`w-16 h-16 flex items-center justify-center text-3xl mb-3 relative z-10 transition-all duration-500 ${
+                        isActive
+                          ? 'bg-fuel-500 shadow-lg shadow-fuel-500/50'
+                          : 'bg-asphalt-700 border-2 border-asphalt-600'
+                      }`}
+                      style={{
+                        clipPath: 'polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)',
+                        transform: isCurrent ? 'scale(1.1)' : 'scale(1)',
+                      }}
+                    >
+                      {step.icon}
+                      {isCurrent && (
+                        <div className="absolute inset-0 border-2 border-fuel-400 animate-ping"
+                             style={{clipPath: 'polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)'}}></div>
+                      )}
+                    </div>
+                    <p
+                      className={`text-xs text-center font-bold tracking-wider max-w-[80px] ${
+                        isActive ? 'text-asphalt-100' : 'text-asphalt-500'
+                      }`}
+                    >
+                      {step.label.toUpperCase()}
+                    </p>
                   </div>
-                  <p
-                    className={`text-xs text-center ${
-                      index <= currentStatusIndex
-                        ? 'text-gray-900 font-semibold'
-                        : 'text-gray-500'
-                    }`}
-                  >
-                    {step.label}
-                  </p>
-                </div>
-                {index < statusSteps.length - 1 && (
-                  <div
-                    className={`h-1 flex-1 ${
-                      index < currentStatusIndex ? 'bg-primary-600' : 'bg-gray-200'
-                    }`}
-                  />
-                )}
-              </div>
-            ))}
+                )
+              })}
+            </div>
           </div>
         </div>
       )}
@@ -186,37 +203,42 @@ export default function TrackJobPage() {
       <div className="grid md:grid-cols-2 gap-6">
         {/* Delivery Details */}
         <div className="card">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Delivery Details</h2>
-          <div className="space-y-3">
-            <div>
-              <p className="text-sm text-gray-600">Vehicle</p>
-              <p className="font-medium text-gray-900">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-1 h-8 bg-fuel-500"></div>
+            <h2 className="font-display font-bold text-2xl text-asphalt-100 tracking-tight">DELIVERY DETAILS</h2>
+          </div>
+          <div className="space-y-4">
+            <div className="pb-4 border-b border-asphalt-700">
+              <p className="text-xs text-asphalt-500 font-bold tracking-widest mb-1">VEHICLE</p>
+              <p className="font-semibold text-asphalt-100 text-lg">
                 {job.vehicles?.year} {job.vehicles?.make} {job.vehicles?.model}
               </p>
             </div>
-            <div>
-              <p className="text-sm text-gray-600">Location</p>
-              <p className="font-medium text-gray-900">{job.service_locations?.name}</p>
-              <p className="text-sm text-gray-600">{job.delivery_address}</p>
+            <div className="pb-4 border-b border-asphalt-700">
+              <p className="text-xs text-asphalt-500 font-bold tracking-widest mb-1">LOCATION</p>
+              <p className="font-semibold text-asphalt-100">{job.service_locations?.name}</p>
+              <p className="text-sm text-asphalt-400 mt-1">📍 {job.delivery_address}</p>
             </div>
-            <div>
-              <p className="text-sm text-gray-600">Fuel Type</p>
-              <p className="font-medium text-gray-900 capitalize">{job.fuel_type}</p>
+            <div className="grid grid-cols-2 gap-4 pb-4 border-b border-asphalt-700">
+              <div>
+                <p className="text-xs text-asphalt-500 font-bold tracking-widest mb-1">FUEL TYPE</p>
+                <p className="font-semibold text-asphalt-100 capitalize">{job.fuel_type}</p>
+              </div>
+              <div>
+                <p className="text-xs text-asphalt-500 font-bold tracking-widest mb-1">AMOUNT</p>
+                <p className="font-semibold text-asphalt-100">
+                  {job.gallons_delivered || job.gallons_requested} gal
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm text-gray-600">Amount</p>
-              <p className="font-medium text-gray-900">
-                {job.gallons_delivered || job.gallons_requested} gallons
-              </p>
-            </div>
-            <div>
-              <p className="text-sm text-gray-600">Requested</p>
-              <p className="font-medium text-gray-900">{formatDateTime(job.created_at)}</p>
+            <div className="pb-4 border-b border-asphalt-700">
+              <p className="text-xs text-asphalt-500 font-bold tracking-widest mb-1">REQUESTED</p>
+              <p className="font-semibold text-asphalt-100">{formatDateTime(job.created_at)}</p>
             </div>
             {job.notes && (
-              <div>
-                <p className="text-sm text-gray-600">Special Instructions</p>
-                <p className="font-medium text-gray-900">{job.notes}</p>
+              <div className="bg-asphalt-800/50 p-4 border-l-2 border-caution-500">
+                <p className="text-xs text-asphalt-500 font-bold tracking-widest mb-2">SPECIAL INSTRUCTIONS</p>
+                <p className="text-asphalt-200">{job.notes}</p>
               </div>
             )}
           </div>
@@ -224,76 +246,95 @@ export default function TrackJobPage() {
 
         {/* Driver Info */}
         <div className="card">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
-            {driver ? 'Driver Information' : 'Finding Driver'}
-          </h2>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-1 h-8 bg-caution-500"></div>
+            <h2 className="font-display font-bold text-2xl text-asphalt-100 tracking-tight">
+              {driver ? 'DRIVER INFO' : 'FINDING DRIVER'}
+            </h2>
+          </div>
           {driver ? (
-            <div className="space-y-3">
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center text-2xl">
+            <div className="space-y-4">
+              <div className="flex items-center gap-4 pb-4 border-b border-asphalt-700">
+                <div className="w-20 h-20 bg-asphalt-700 flex items-center justify-center text-4xl border-2 border-asphalt-600"
+                     style={{clipPath: 'polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)'}}>
                   👤
                 </div>
-                <div>
-                  <p className="font-semibold text-gray-900">{driver.profiles?.full_name}</p>
-                  <p className="text-sm text-gray-600">{driver.vehicle_info || 'Fuel Delivery Truck'}</p>
+                <div className="flex-1">
+                  <p className="font-display font-bold text-xl text-asphalt-100">{driver.profiles?.full_name}</p>
+                  <p className="text-sm text-asphalt-400">{driver.vehicle_info || 'Fuel Delivery Truck'}</p>
                   {driver.rating && (
-                    <p className="text-sm text-gray-600">⭐ {driver.rating.toFixed(1)} rating</p>
+                    <div className="flex items-center gap-1 mt-1">
+                      <span className="text-caution-400">⭐</span>
+                      <span className="text-sm font-semibold text-asphalt-300">{driver.rating.toFixed(1)} rating</span>
+                    </div>
                   )}
                 </div>
               </div>
               {job.status === 'en_route' && job.estimated_arrival && (
-                <div className="bg-primary-50 p-3 rounded-lg">
-                  <p className="text-sm text-gray-600">Estimated Arrival</p>
-                  <p className="font-semibold text-primary-700">{formatDateTime(job.estimated_arrival)}</p>
+                <div className="bg-fuel-500/10 p-4 border border-fuel-500/30">
+                  <p className="text-xs text-fuel-400 font-bold tracking-widest mb-2">ESTIMATED ARRIVAL</p>
+                  <p className="font-display font-bold text-xl text-fuel-300">{formatDateTime(job.estimated_arrival)}</p>
+                  <div className="mt-3 fuel-gauge">
+                    <div className="fuel-gauge-fill"></div>
+                  </div>
                 </div>
               )}
             </div>
           ) : (
-            <div className="text-center py-8">
-              <div className="text-4xl mb-2">🔍</div>
-              <p className="text-gray-600">Searching for available driver...</p>
+            <div className="text-center py-12">
+              <div className="text-6xl mb-4 animate-pulse">🔍</div>
+              <p className="text-asphalt-400 font-semibold">Searching for available driver...</p>
+              <div className="mt-4 max-w-xs mx-auto">
+                <div className="h-1 bg-asphalt-700 rounded-full overflow-hidden">
+                  <div className="h-full bg-caution-500 animate-pulse"></div>
+                </div>
+              </div>
             </div>
           )}
         </div>
       </div>
 
       {/* Payment Summary */}
-      <div className="card bg-gray-50">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Payment Summary</h2>
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <span className="text-gray-600">
-              {job.gallons_delivered || job.gallons_requested} gallons × {formatCurrency(job.price_per_gallon)}
+      <div className="card bg-asphalt-800/80 border-2 border-asphalt-700">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-1 h-8 bg-blue-500"></div>
+          <h2 className="font-display font-bold text-2xl text-asphalt-100 tracking-tight">PAYMENT SUMMARY</h2>
+        </div>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between py-2">
+            <span className="text-asphalt-400">
+              {job.gallons_delivered || job.gallons_requested} gal × {formatCurrency(job.price_per_gallon)}
             </span>
-            <span className="text-gray-900">
+            <span className="font-semibold text-asphalt-100">
               {formatCurrency((job.gallons_delivered || job.gallons_requested) * job.price_per_gallon)}
             </span>
           </div>
-          <div className="flex items-center justify-between">
-            <span className="text-gray-600">Service Fee</span>
-            <span className="text-gray-900">{formatCurrency(job.service_fee)}</span>
+          <div className="flex items-center justify-between py-2 border-b border-asphalt-700">
+            <span className="text-asphalt-400">Service Fee</span>
+            <span className="font-semibold text-asphalt-100">{formatCurrency(job.service_fee)}</span>
           </div>
-          <div className="border-t pt-2 mt-2">
-            <div className="flex items-center justify-between">
-              <span className="font-semibold text-gray-900">Total</span>
-              <span className="font-bold text-xl text-gray-900">{formatCurrency(job.total_amount)}</span>
-            </div>
+          <div className="flex items-center justify-between pt-4">
+            <span className="font-display font-bold text-lg text-asphalt-100 tracking-wide">TOTAL</span>
+            <span className="font-display font-bold text-3xl text-fuel-400" style={{textShadow: '0 0 20px rgba(34, 197, 94, 0.3)'}}>
+              {formatCurrency(job.total_amount)}
+            </span>
           </div>
         </div>
       </div>
 
       {/* Actions */}
-      <div className="flex gap-4">
+      <div className="flex gap-4 flex-wrap">
         <button
           onClick={() => router.push('/customer')}
-          className="btn-secondary flex-1"
+          className="btn-secondary flex-1 min-w-[200px]"
         >
-          Back to Dashboard
+          ← Back to Dashboard
         </button>
         {job.status !== 'completed' && job.status !== 'cancelled' && (
           <button
             onClick={handleCancelJob}
-            className="px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors"
+            className="btn-primary bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800"
+            style={{boxShadow: '0 0 20px rgba(220, 38, 38, 0.3)'}}
           >
             Cancel Delivery
           </button>

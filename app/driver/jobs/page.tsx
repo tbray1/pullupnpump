@@ -69,7 +69,7 @@ export default function AvailableJobsPage() {
         // Calculate distances
         const jobsWithDistance = jobsData.map((job) => ({
           ...job,
-          distance: driverData.current_latitude
+          distance: driverData.current_latitude && driverData.current_longitude
             ? calculateDistance(
                 driverData.current_latitude,
                 driverData.current_longitude,
@@ -125,19 +125,22 @@ export default function AvailableJobsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-96">
-        <p className="text-gray-600">Loading available jobs...</p>
+        <div className="text-center">
+          <div className="text-5xl mb-4 animate-pulse">📡</div>
+          <p className="text-asphalt-300 font-display font-bold tracking-wider">SCANNING DISPATCH BOARD...</p>
+        </div>
       </div>
     )
   }
 
   if (!driver?.is_approved) {
     return (
-      <div className="card text-center py-12">
-        <div className="text-6xl mb-4">⚠️</div>
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">
-          Account Pending Approval
+      <div className="card text-center py-16 max-w-2xl mx-auto">
+        <div className="text-7xl mb-6">⚠️</div>
+        <h3 className="font-display font-bold text-3xl text-asphalt-100 mb-3">
+          ACCOUNT PENDING APPROVAL
         </h3>
-        <p className="text-gray-600">
+        <p className="text-asphalt-400 text-lg">
           You cannot accept jobs until your account is approved
         </p>
       </div>
@@ -146,12 +149,12 @@ export default function AvailableJobsPage() {
 
   if (driver?.status !== 'online') {
     return (
-      <div className="card text-center py-12">
-        <div className="text-6xl mb-4">📴</div>
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">
-          You're Offline
+      <div className="card text-center py-16 max-w-2xl mx-auto">
+        <div className="text-7xl mb-6">📴</div>
+        <h3 className="font-display font-bold text-3xl text-asphalt-100 mb-3">
+          YOU'RE OFFLINE
         </h3>
-        <p className="text-gray-600 mb-6">
+        <p className="text-asphalt-400 text-lg mb-8">
           Go online to see available delivery jobs
         </p>
         <a href="/driver">
@@ -162,70 +165,110 @@ export default function AvailableJobsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-900">Available Jobs</h1>
+    <div className="space-y-8 p-6 max-w-7xl mx-auto">
+      {/* Header */}
+      <div className="flex items-center justify-between flex-wrap gap-4">
+        <div>
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-3 h-3 bg-fuel-500 rounded-full animate-pulse shadow-lg shadow-fuel-500/50"></div>
+            <span className="text-fuel-400 font-bold text-sm tracking-widest">ONLINE • READY FOR DISPATCH</span>
+          </div>
+          <h1 className="font-display font-bold text-5xl text-asphalt-100 tracking-tight">
+            AVAILABLE JOBS
+          </h1>
+        </div>
         <button
           onClick={loadData}
-          className="btn-secondary"
+          className="btn-secondary flex items-center gap-2"
         >
-          🔄 Refresh
+          <span>🔄</span>
+          <span>REFRESH BOARD</span>
         </button>
       </div>
 
+      {/* Job Count Badge */}
+      {jobs.length > 0 && (
+        <div className="inline-block bg-caution-500/20 border border-caution-500/40 px-4 py-2"
+             style={{clipPath: 'polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)'}}>
+          <span className="text-caution-300 font-display font-bold tracking-wider">
+            {jobs.length} ACTIVE {jobs.length === 1 ? 'DELIVERY' : 'DELIVERIES'} AVAILABLE
+          </span>
+        </div>
+      )}
+
       {jobs.length > 0 ? (
         <div className="space-y-4">
-          {jobs.map((job) => (
-            <div key={job.id} className="card hover:shadow-lg transition-shadow">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="text-sm font-semibold text-primary-600">
-                      NEW JOB
-                    </span>
+          {jobs.map((job, index) => (
+            <div key={job.id} className="card hover:border-fuel-500/30 transition-all duration-300" style={{animationDelay: `${index * 50}ms`}}>
+              <div className="flex items-start justify-between gap-6 flex-wrap">
+                <div className="flex-1 min-w-[300px]">
+                  {/* Job Header */}
+                  <div className="flex items-center gap-3 mb-4 flex-wrap">
+                    <div className="bg-fuel-500/20 border border-fuel-500/40 px-3 py-1"
+                         style={{clipPath: 'polygon(6px 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%, 0 6px)'}}>
+                      <span className="text-fuel-400 font-bold text-xs tracking-widest">NEW DISPATCH</span>
+                    </div>
                     {job.distance !== null && (
-                      <span className="text-sm text-gray-600">
-                        📍 {job.distance.toFixed(1)} km away
+                      <span className="text-asphalt-400 text-sm font-semibold">
+                        📍 {job.distance.toFixed(1)} km
                       </span>
                     )}
-                    <span className="text-sm text-gray-600">
+                    <span className="text-asphalt-500 text-sm">
                       {formatDateTime(job.created_at)}
                     </span>
                   </div>
-                  <h3 className="font-semibold text-gray-900 mb-1">
+
+                  {/* Vehicle */}
+                  <h3 className="font-display font-bold text-2xl text-asphalt-100 mb-3">
                     {job.vehicles?.year} {job.vehicles?.make} {job.vehicles?.model}
                   </h3>
-                  <p className="text-sm text-gray-600 mb-2">
-                    📍 {job.delivery_address}
-                  </p>
-                  <div className="flex items-center gap-4 text-sm mb-4">
-                    <span className="text-gray-600">
-                      <span className="font-medium">Fuel:</span> {job.fuel_type}
-                    </span>
-                    <span className="text-gray-600">
-                      <span className="font-medium">Amount:</span>{' '}
-                      {job.gallons_requested} gal
-                    </span>
+
+                  {/* Location */}
+                  <div className="flex items-start gap-2 mb-4 text-asphalt-300">
+                    <span className="text-caution-400">📍</span>
+                    <span>{job.delivery_address}</span>
                   </div>
+
+                  {/* Job Details Grid */}
+                  <div className="grid grid-cols-2 gap-4 mb-4 pb-4 border-b border-asphalt-700">
+                    <div>
+                      <p className="text-xs text-asphalt-500 font-bold tracking-widest mb-1">FUEL TYPE</p>
+                      <p className="text-asphalt-100 font-semibold capitalize">{job.fuel_type}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-asphalt-500 font-bold tracking-widest mb-1">AMOUNT</p>
+                      <p className="text-asphalt-100 font-semibold">{job.gallons_requested} gal</p>
+                    </div>
+                  </div>
+
+                  {/* Notes */}
                   {job.notes && (
-                    <p className="text-sm text-gray-600 bg-gray-50 p-2 rounded">
-                      <span className="font-medium">Notes:</span> {job.notes}
-                    </p>
+                    <div className="bg-asphalt-800/50 p-3 border-l-2 border-caution-500">
+                      <p className="text-xs text-asphalt-500 font-bold tracking-widest mb-1">SPECIAL NOTES</p>
+                      <p className="text-asphalt-300 text-sm">{job.notes}</p>
+                    </div>
                   )}
                 </div>
-                <div className="text-right ml-6">
-                  <p className="text-sm text-gray-600 mb-1">Customer Pays</p>
-                  <p className="text-2xl font-bold text-gray-900 mb-1">
-                    {formatCurrency(job.total_amount)}
-                  </p>
-                  <p className="text-sm text-green-600 font-semibold mb-4">
-                    You earn ~{formatCurrency(job.total_amount * 0.7)}
-                  </p>
+
+                {/* Earnings & Action */}
+                <div className="text-right min-w-[200px] flex flex-col items-end gap-3">
+                  <div className="w-full bg-asphalt-800/60 p-4 border border-asphalt-700"
+                       style={{clipPath: 'polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)'}}>
+                    <p className="text-xs text-asphalt-500 font-bold tracking-widest mb-1">CUSTOMER PAYS</p>
+                    <p className="font-display font-bold text-3xl text-asphalt-100 mb-3">
+                      {formatCurrency(job.total_amount)}
+                    </p>
+                    <div className="h-1 bg-asphalt-700 mb-3"></div>
+                    <p className="text-xs text-asphalt-500 font-bold tracking-widest mb-1">YOUR EARNINGS</p>
+                    <p className="font-display font-bold text-2xl text-fuel-400" style={{textShadow: '0 0 15px rgba(34, 197, 94, 0.3)'}}>
+                      ~{formatCurrency(job.total_amount * 0.7)}
+                    </p>
+                  </div>
                   <button
                     onClick={() => handleAcceptJob(job.id)}
-                    className="btn-primary px-6"
+                    className="btn-primary w-full"
                   >
-                    Accept Job
+                    ACCEPT DISPATCH
                   </button>
                 </div>
               </div>
@@ -233,14 +276,19 @@ export default function AvailableJobsPage() {
           ))}
         </div>
       ) : (
-        <div className="card text-center py-12">
-          <div className="text-6xl mb-4">📭</div>
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">
-            No Available Jobs
+        <div className="card text-center py-20">
+          <div className="text-8xl mb-6 opacity-50">📭</div>
+          <h3 className="font-display font-bold text-3xl text-asphalt-100 mb-3">
+            NO ACTIVE DELIVERIES
           </h3>
-          <p className="text-gray-600">
-            Check back soon for new delivery requests
+          <p className="text-asphalt-400 text-lg">
+            Check back soon for new dispatch requests
           </p>
+          <div className="mt-8 max-w-md mx-auto">
+            <div className="fuel-gauge">
+              <div className="fuel-gauge-fill bg-asphalt-600 shadow-none" style={{animationDuration: '3s'}}></div>
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -12,12 +12,15 @@ export default function DriverJobPage() {
   const params = useParams()
   const router = useRouter()
   const supabase = createClient()
+  const jobId = typeof params.id === 'string' ? params.id : ''
 
   useEffect(() => {
+    if (!jobId) return
     loadJob()
-  }, [params.id])
+  }, [jobId])
 
   const loadJob = async () => {
+    if (!jobId) return
     const { data, error } = await supabase
       .from('jobs')
       .select(`
@@ -29,7 +32,7 @@ export default function DriverJobPage() {
           profiles!customers_id_fkey (full_name, phone)
         )
       `)
-      .eq('id', params.id)
+      .eq('id', jobId)
       .single()
 
     if (data) {
@@ -97,7 +100,7 @@ export default function DriverJobPage() {
       const { error } = await supabase
         .from('jobs')
         .update(updates)
-        .eq('id', params.id)
+        .eq('id', jobId)
 
       if (error) throw error
 
